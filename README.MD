@@ -2,7 +2,7 @@
 
 
 
-![Phoca Cart Finder Product Plugin](https://github.com/PhocaCz/PhocaCartFinderProductPlugin/blob/master/phocacartproduct.png?raw=true)
+![Phoca Cart Finder Product Plugin](https://github.com/PhocaCz/PhocaCartFinderProductPlugin/blob/main/phocacartproduct.png?raw=true)
 
 # Phoca Cart Finder Product Plugin
 

@@ -38,6 +38,6 @@
 	</config>
 
 	<updateservers>
-		<server type="extension" name="PLG_FINDER_PHOCACARTPRODUCT" priority="1"><![CDATA[https://raw.githubusercontent.com/PhocaCz/PhocaCartFinderProductPlugin/master/manifest.xml]]></server>
+		<server type="extension" name="PLG_FINDER_PHOCACARTPRODUCT" priority="1"><![CDATA[https://raw.githubusercontent.com/PhocaCz/PhocaCartFinderProductPlugin/main/manifest.xml]]></server>
 	</updateservers>
 </extension>
