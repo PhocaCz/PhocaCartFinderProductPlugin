@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="finder" method="upgrade" version="4.0">
+	<name>plg_finder_phocacartproduct</name>
+	<author>Jan Pavelka (www.phoca.cz)</author>
+	<creationDate>19/07/2022</creationDate>
+	<authorEmail></authorEmail>
+	<authorUrl>https://www.phoca.cz</authorUrl>
+	<copyright>Jan Pavelka</copyright>
+	<license>GNU/GPL</license>
+	<version>4.0.2</version>
+	<description>PLG_FINDER_PHOCACARTPRODUCT_DESCRIPTION</description>
+	<projectName>PhocaCartFinderProductPlugin</projectName>
+
+	<files>
+		<filename plugin="phocacartproduct">index.html</filename>
+		<filename plugin="phocacartproduct">phocacartproduct.php</filename>
+		<filename plugin="phocacartproduct">manifest.xml</filename>
+	</files>
+
+	<languages>
+		<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocacartproduct.ini</language>
+		<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocacartproduct.sys.ini</language>
+	</languages>
+
+	<administration>
+		<languages>
+			<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocacartproduct.ini</language>
+			<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocacartproduct.sys.ini</language>
+		</languages>
+	</administration>
+	
+	<config>
+	<fields name="params">
+		<fieldset name="basic">
+
+		</fieldset>
+	</fields>
+	</config>
+
+	<updateservers>
+		<server type="extension" name="PLG_FINDER_PHOCACARTPRODUCT" priority="1"><![CDATA[https://raw.githubusercontent.com/PhocaCz/PhocaCartFinderProductPlugin/master/manifest.xml]]></server>
+	</updateservers>
+</extension>
