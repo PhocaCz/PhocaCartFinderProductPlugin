@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="plugin" group="finder" method="upgrade" version="4.0">
+<extension type="plugin" group="finder" method="upgrade" version="5.0">
 	<name>plg_finder_phocacartproduct</name>
 	<author>Jan Pavelka (www.phoca.cz)</author>
-	<creationDate>19/07/2022</creationDate>
+	<creationDate>24/09/2024</creationDate>
 	<authorEmail></authorEmail>
 	<authorUrl>https://www.phoca.cz</authorUrl>
 	<copyright>Jan Pavelka</copyright>
 	<license>GNU/GPL</license>
-	<version>4.0.2</version>
+	<version>5.0.1</version>
 	<description>PLG_FINDER_PHOCACARTPRODUCT_DESCRIPTION</description>
 	<projectName>PhocaCartFinderProductPlugin</projectName>
 
@@ -32,7 +32,10 @@
 	<config>
 	<fields name="params">
 		<fieldset name="basic">
-
+			<field name="search_link" type="list" default="0" label="PLG_FINDER_PHOCACARTPRODUCT_SEARCH_LINK_LABEL" description="PLG_FINDER_PHOCACARTPRODUCT_SEARCH_LINK_DESC">
+				<option value="0">PLG_FINDER_PHOCACARTPRODUCT_ITEM_VIEW</option>
+				<option value="1">PLG_FINDER_PHOCACARTPRODUCT_CATEGORY_VIEW</option>
+			</field>
 		</fieldset>
 	</fields>
 	</config>

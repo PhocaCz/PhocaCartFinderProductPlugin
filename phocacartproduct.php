@@ -8,16 +8,30 @@
  */
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\Component\Finder\Administrator\Indexer\Adapter;
+use Joomla\Component\Finder\Administrator\Indexer\Indexer;
 use Joomla\Database\DatabaseQuery;
+use Joomla\Registry\Registry;
+use Joomla\Component\Finder\Administrator\Indexer\Helper;
+
 
 defined('JPATH_BASE') or die;
 require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
 
-class PlgFinderPhocacartproduct extends FinderIndexerAdapter
+if (file_exists(JPATH_ADMINISTRATOR . '/components/com_phocacart/libraries/bootstrap.php')) {
+	// Joomla 5 and newer
+	require_once(JPATH_ADMINISTRATOR . '/components/com_phocacart/libraries/bootstrap.php');
+} else {
+	// Joomla 4
+	JLoader::registerPrefix('Phocacart', JPATH_ADMINISTRATOR . '/components/com_phocacart/libraries/phocacart');
+}
+
+class PlgFinderPhocacartproduct extends Adapter
 {
-	protected $context 			= 'Phocacartproduct';
+	protected $context 			= 'Phocacartitem';
 	protected $extension 		= 'com_phocacart';
-	protected $layout 			= 'category';
+	protected $layout 			= 'item';
 	protected $type_title 		= 'Phoca Cart';
 	protected $table 			= '#__phocacart_products';
 	protected $autoloadLanguage = true;
@@ -39,7 +53,8 @@ class PlgFinderPhocacartproduct extends FinderIndexerAdapter
 
 	public function onFinderAfterDelete($context, $table)
 	{
-		if ($context == 'com_phocacart.phocacartproduct')
+
+		if ($context == 'com_phocacart.phocacartitem')
 		{
 			$id = $table->id;
 		}
@@ -58,7 +73,7 @@ class PlgFinderPhocacartproduct extends FinderIndexerAdapter
 	public function onFinderAfterSave($context, $row, $isNew)
 	{
 		// We only want to handle web links here. We need to handle front end and back end editing.
-		if ($context == 'com_phocacart.phocacartproduct' || $context == 'com_phocacart.product' )
+		if ($context == 'com_phocacart.phocacartitem' || $context == 'com_phocacart.item' || $context == 'com_phocacart.product' )
 		{
 			// Check if the access levels are different
 			if (!$isNew && $this->old_access != $row->access)
@@ -125,8 +140,7 @@ class PlgFinderPhocacartproduct extends FinderIndexerAdapter
 
 	}
 
-
-	protected function index(FinderIndexerResult $item, $format = 'html')
+	protected function index(Joomla\Component\Finder\Administrator\Indexer\Result $item, $format = 'html')
 	{
 		// Check if the extension is enabled
 		if (ComponentHelper::isEnabled($this->extension) == false)
@@ -137,19 +151,37 @@ class PlgFinderPhocacartproduct extends FinderIndexerAdapter
 		$item->setLanguage();
 
 		// Initialize the item parameters.
-		$registry = new JRegistry;
-		$registry->loadString($item->params);
-		$item->params = $registry;
+        if (!empty($item->params)) {
+            $registry = new Registry;
+            $registry->loadString($item->params);
+            $item->params = $registry;
+        }
 
-		$registry = new JRegistry;
-		$registry->loadString($item->metadata);
-		$item->metadata = $registry;
+        if (!empty($item->metadata)) {
+            $registry = new Registry;
+            $registry->loadString($item->metadata);
+            $item->metadata = $registry;
+        }
 
 		// Build the necessary route and path information.
 		$item->url = $this->getURL($item->id, $this->extension, $this->layout);
-        $item->route = PhocacartRoute::getItemRoute($item->id, $item->categoryid, $item->alias, $item->categoryalias, $item->language);
+        //$item->route = PhocacartRoute::getItemRoute($item->id, $item->categoryid, $item->alias, $item->categoryalias, $item->language);
 		//$item->path = FinderIndexerHelper::getContentPath($item->route);
-		$item->url = $this->getURL($item->id, $this->extension, $this->layout);
+		//$item->url = $this->getURL($item->id, $this->extension, $this->layout);
+        $p['search_link']			= $this->params->get( 'search_link', 0 );
+		switch ($p['search_link'])
+		{
+            case 1:
+                $item->route = PhocacartRoute::getCategoryRoute($item->categoryid, $item->categoryalias, $item->language);
+                //$item->url = $item->route . '&productid='.$item->id;// We can have all items redirected to category view, so add unique item
+				break;
+			case 0:
+			default:
+                //$item->url = $this->getURL($item->id, $this->extension, $this->layout);
+                $item->route = PhocacartRoute::getItemRoute($item->id, $item->categoryid, $item->alias, $item->categoryalias, $item->language);
+                //$item->url = $item->route;
+			break;
+		}
 
 
 		/*
@@ -157,27 +189,31 @@ class PlgFinderPhocacartproduct extends FinderIndexerAdapter
 		 * configuration parameters.
 		 */
 		// Add the meta-author.
-		$item->metaauthor = $item->metadata->get('author');
-
+        if (!empty($item->metadata)) {
+            $item->metaauthor = $item->metadata->get('author');
+        }
 		// Handle the link to the meta-data.
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'link');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metakey');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metadesc');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metaauthor');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'author');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'created_by_alias');
+		$item->addInstruction(Indexer::META_CONTEXT, 'link');
+		$item->addInstruction(Indexer::META_CONTEXT, 'metakey');
+		$item->addInstruction(Indexer::META_CONTEXT, 'metadesc');
+		$item->addInstruction(Indexer::META_CONTEXT, 'metaauthor');
+		$item->addInstruction(Indexer::META_CONTEXT, 'author');
+		$item->addInstruction(Indexer::META_CONTEXT, 'created_by_alias');
 
 		// Add the type taxonomy data.
 		$item->addTaxonomy('Type', 'Phoca Cart');
 
 		// Add the category taxonomy data.
-		$item->addTaxonomy('Category', $item->category, $item->cat_state, $item->cat_access);
+
+        if (isset($item->category) && $item->category != '') {
+            $item->addTaxonomy('Category', $item->category, $item->cat_state, $item->cat_access);
+        }
 
 		// Add the language taxonomy data.
 		$item->addTaxonomy('Language', $item->language);
 
 		// Get content extras.
-		FinderIndexerHelper::getContentExtras($item);
+		Helper::getContentExtras($item);
 
 		// Index the item.
 		$this->indexer->index($item);
@@ -191,7 +227,7 @@ class PlgFinderPhocacartproduct extends FinderIndexerAdapter
 
 	protected function getListQuery($query = null)
 	{
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 		// Check if we can use the supplied SQL query.
 		$query = $query instanceof DatabaseQuery ? $query : $db->getQuery(true)
 			->select('a.id, a.catid, a.title, a.alias, "" AS link, a.description AS summary')
