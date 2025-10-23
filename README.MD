@@ -58,7 +58,7 @@ Phoca Cart Finder Product plugin is a Joomla! plugin which allows you to search 
 
 ## Version (Joomla! 5.x)
 
-5.0.1
+5.0.2
 
 
 

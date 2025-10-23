@@ -16,8 +16,8 @@ use Joomla\Registry\Registry;
 use Joomla\Component\Finder\Administrator\Indexer\Helper;
 
 
-defined('JPATH_BASE') or die;
-require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
+defined('_JEXEC') or die;
+//require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
 
 if (file_exists(JPATH_ADMINISTRATOR . '/components/com_phocacart/libraries/bootstrap.php')) {
 	// Joomla 5 and newer
@@ -215,6 +215,24 @@ class PlgFinderPhocacartproduct extends Adapter
 		// Get content extras.
 		Helper::getContentExtras($item);
 
+
+        // Add the image.
+        if (!empty($item->image)) {
+
+            $path = PhocacartPath::getPath('productimage');
+            $thumbLink	= PhocacartImage::getThumbnailName($path, $item->image, 'small');
+            if ($thumbLink->rel != '') {
+                $item->imageUrl = $thumbLink->rel;
+                $item->imageAlt = addslashes(PhocacartText::filterValue($item->title, 'text')) ?? '';
+                $item->images = json_encode([
+                    'image_intro' => $item->imageUrl,
+                    'image_intro_alt' => '',
+                    'image_fulltext' => $item->imageUrl,
+                    'image_fulltext_alt' => ''
+                ]);
+            }
+        }
+
 		// Index the item.
 		$this->indexer->index($item);
 	}
@@ -230,7 +248,7 @@ class PlgFinderPhocacartproduct extends Adapter
 		$db = Factory::getDbo();
 		// Check if we can use the supplied SQL query.
 		$query = $query instanceof DatabaseQuery ? $query : $db->getQuery(true)
-			->select('a.id, a.catid, a.title, a.alias, "" AS link, a.description AS summary')
+			->select('a.id, a.catid, a.title, a.alias, "" AS link, a.description AS summary, a.image')
 			->select('a.metakey, a.metadesc, a.metadata, a.language, a.access, a.ordering')
 			->select('"" AS created_by_alias, "" AS modified, "" AS modified_by')
 			->select('a.date AS publish_start_date, "" AS publish_end_date')
@@ -241,7 +259,8 @@ class PlgFinderPhocacartproduct extends Adapter
 		$case_when_item_alias = ' CASE WHEN ';
 		$case_when_item_alias .= $query->charLength('a.alias', '!=', '0');
 		$case_when_item_alias .= ' THEN ';
-		$a_id = $query->castAsChar('a.id');
+		//$a_id = $query->castAsChar('a.id');
+		$a_id = $query->castAs('CHAR', 'a.id');
 		$case_when_item_alias .= $query->concatenate(array($a_id, 'a.alias'), ':');
 		$case_when_item_alias .= ' ELSE ';
 		$case_when_item_alias .= $a_id.' END as slug';
@@ -250,7 +269,8 @@ class PlgFinderPhocacartproduct extends Adapter
 		$case_when_category_alias = ' CASE WHEN ';
 		$case_when_category_alias .= $query->charLength('c.alias', '!=', '0');
 		$case_when_category_alias .= ' THEN ';
-		$c_id = $query->castAsChar('c.id');
+		//$c_id = $query->castAsChar('c.id');
+		$c_id = $query->castAs('CHAR', 'c.id');
 		$case_when_category_alias .= $query->concatenate(array($c_id, 'c.alias'), ':');
 		$case_when_category_alias .= ' ELSE ';
 		$case_when_category_alias .= $c_id.' END as catslug';
